@@ -38,3 +38,8 @@ out/
 
 ### Kotlin ###
 .kotlin
+
+
+application-local.properties
+.env
+*.local.properties
