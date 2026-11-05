@@ -9,68 +9,163 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as PlacesRouteImport } from './routes/places'
+import { Route as PublicRouteImport } from './routes/_public'
+import { Route as PublicIndexRouteImport } from './routes/_public/index'
+import { Route as PublicLoginRouteImport } from './routes/_public/login'
+import { Route as PublicPlacesRouteImport } from './routes/_public/places'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as PublicPlacesPlaceIdRouteImport } from './routes/_public/places.$placeId'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const PublicRoute = PublicRouteImport.update({
+  id: '/_public',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PlacesRoute = PlacesRouteImport.update({
+const PublicIndexRoute = PublicIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicLoginRoute = PublicLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicPlacesRoute = PublicPlacesRouteImport.update({
   id: '/places',
   path: '/places',
+  getParentRoute: () => PublicRoute,
+} as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PublicPlacesPlaceIdRoute = PublicPlacesPlaceIdRouteImport.update({
+  id: '/$placeId',
+  path: '/$placeId',
+  getParentRoute: () => PublicPlacesRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/places': typeof PlacesRoute
+  '/': typeof PublicIndexRoute
+  '/login': typeof PublicLoginRoute
+  '/places': typeof PublicPlacesRouteWithChildren
+  '/dashboard/': typeof DashboardIndexRoute
+  '/places/$placeId': typeof PublicPlacesPlaceIdRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/places': typeof PlacesRoute
+  '/login': typeof PublicLoginRoute
+  '/places': typeof PublicPlacesRouteWithChildren
+  '/': typeof PublicIndexRoute
+  '/dashboard': typeof DashboardIndexRoute
+  '/places/$placeId': typeof PublicPlacesPlaceIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/places': typeof PlacesRoute
+  '/_public': typeof PublicRouteWithChildren
+  '/_public/login': typeof PublicLoginRoute
+  '/_public/places': typeof PublicPlacesRouteWithChildren
+  '/_public/': typeof PublicIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/_public/places/$placeId': typeof PublicPlacesPlaceIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/places'
+  fullPaths: '/' | '/login' | '/places' | '/dashboard/' | '/places/$placeId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/places'
-  id: '__root__' | '/' | '/places'
+  to: '/login' | '/places' | '/' | '/dashboard' | '/places/$placeId'
+  id:
+    | '__root__'
+    | '/_public'
+    | '/_public/login'
+    | '/_public/places'
+    | '/_public/'
+    | '/dashboard/'
+    | '/_public/places/$placeId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  PlacesRoute: typeof PlacesRoute
+  PublicRoute: typeof PublicRouteWithChildren
+  DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
+    '/_public': {
+      id: '/_public'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof PublicRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/places': {
-      id: '/places'
+    '/_public/': {
+      id: '/_public/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof PublicIndexRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/login': {
+      id: '/_public/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof PublicLoginRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/places': {
+      id: '/_public/places'
       path: '/places'
       fullPath: '/places'
-      preLoaderRoute: typeof PlacesRouteImport
+      preLoaderRoute: typeof PublicPlacesRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_public/places/$placeId': {
+      id: '/_public/places/$placeId'
+      path: '/$placeId'
+      fullPath: '/places/$placeId'
+      preLoaderRoute: typeof PublicPlacesPlaceIdRouteImport
+      parentRoute: typeof PublicPlacesRoute
     }
   }
 }
 
+interface PublicPlacesRouteChildren {
+  PublicPlacesPlaceIdRoute: typeof PublicPlacesPlaceIdRoute
+}
+
+const PublicPlacesRouteChildren: PublicPlacesRouteChildren = {
+  PublicPlacesPlaceIdRoute: PublicPlacesPlaceIdRoute,
+}
+
+const PublicPlacesRouteWithChildren = PublicPlacesRoute._addFileChildren(
+  PublicPlacesRouteChildren,
+)
+
+interface PublicRouteChildren {
+  PublicLoginRoute: typeof PublicLoginRoute
+  PublicPlacesRoute: typeof PublicPlacesRouteWithChildren
+  PublicIndexRoute: typeof PublicIndexRoute
+}
+
+const PublicRouteChildren: PublicRouteChildren = {
+  PublicLoginRoute: PublicLoginRoute,
+  PublicPlacesRoute: PublicPlacesRouteWithChildren,
+  PublicIndexRoute: PublicIndexRoute,
+}
+
+const PublicRouteWithChildren =
+  PublicRoute._addFileChildren(PublicRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  PlacesRoute: PlacesRoute,
+  PublicRoute: PublicRouteWithChildren,
+  DashboardIndexRoute: DashboardIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

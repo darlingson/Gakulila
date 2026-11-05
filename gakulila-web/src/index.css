@@ -1,5 +1,22 @@
 @import "tailwindcss";
 
+@theme {
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  --color-paper: #FAF6EF;
+  --color-cream: #F3EDE2;
+  --color-sand: #E4DACA;
+  --color-ink: #221B14;
+  --color-ink-soft: #5B5147;
+  --color-ember: #C2410C;
+  --color-ember-deep: #9A3412;
+  --color-herb: #4F7A17;
+  --color-gold: #D97706;
+
+  --radius-card: 0.875rem;
+}
+
 :root {
   font: 16px/1.5 system-ui, 'Segoe UI', Roboto, sans-serif;
   color-scheme: light dark;
@@ -14,7 +31,7 @@
 }
 
 body {
-  margin: 0;
+  @apply bg-paper text-ink font-sans antialiased;
 }
 
 #root {
