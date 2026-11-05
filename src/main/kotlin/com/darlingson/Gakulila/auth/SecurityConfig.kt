@@ -7,10 +7,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository
+import org.springframework.security.web.context.SecurityContextRepository
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.ProviderManager
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.http.HttpStatus
+import org.springframework.security.web.authentication.HttpStatusEntryPoint
 
 @Configuration
 @EnableMethodSecurity
@@ -19,6 +23,9 @@ class SecurityConfig {
     @Bean
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
+    @Bean
+    fun securityContextRepository(): SecurityContextRepository =
+    HttpSessionSecurityContextRepository()
     @Bean
     fun authenticationManager(
     userDetailsService: UserDetailsService,
@@ -39,5 +46,8 @@ class SecurityConfig {
                     .requestMatchers("/api/v1/auth/**").permitAll()
                     .anyRequest().authenticated()
             }
+            .exceptionHandling {
+                it.authenticationEntryPoint(HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                }
             .build()
 }

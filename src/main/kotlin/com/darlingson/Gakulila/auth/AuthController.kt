@@ -1,29 +1,35 @@
 package com.darlingson.Gakulila.auth
 
 import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.security.web.context.SecurityContextRepository
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/auth")
 class AuthController(
     private val authenticationManager: AuthenticationManager,
+    private val securityContextRepository: SecurityContextRepository,
 ) {
 
     @PostMapping("/login", consumes = [MediaType.APPLICATION_JSON_VALUE])
-    fun login(@RequestBody request: LoginRequest): ResponseEntity<UserResponse> {
+    fun login(
+        @RequestBody request: LoginRequest,
+        servletRequest: HttpServletRequest,
+        servletResponse: HttpServletResponse,
+    ): ResponseEntity<UserResponse> {
         val authentication = authenticationManager.authenticate(
             UsernamePasswordAuthenticationToken(request.username, request.password)
         )
-        SecurityContextHolder.getContext().authentication = authentication
+        val context = SecurityContextHolder.createEmptyContext()
+        context.authentication = authentication
+        SecurityContextHolder.setContext(context)
+        securityContextRepository.saveContext(context, servletRequest, servletResponse)
         return ResponseEntity.ok(UserResponse(username = authentication.name))
     }
 
