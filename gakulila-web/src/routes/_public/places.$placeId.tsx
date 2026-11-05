@@ -2,7 +2,6 @@ import { Link, createFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { placesOptions, ratingsOptions, menuOptions, averageFor } from '@/lib/api'
 import { StarRating } from '@/components/star-rating'
-import { Separator } from '@/components/ui/separator'
 
 export const Route = createFileRoute('/_public/places/$placeId')({
   component: PlaceDetail,
